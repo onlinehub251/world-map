@@ -1,5 +1,164 @@
-<div id="local-info">
-  <h2>📍 Your Location: Abu Dhabi, United Arab Emirates</h2>
-  <img src="https://flagcdn.com/ae.svg" alt="UAE Flag" width="60" />
-  <div id="local-time" style="font-size:2em; margin-top:10px;">--:--:--</div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>World Clock Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #local-info {
+      margin-bottom: 30px;
+    }
+    #local-time {
+      font-size: 2em;
+      margin-top: 10px;
+    }
+    img.flag {
+      width: 60px;
+      height: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #333;
+      color: white;
+    }
+    img.table-flag {
+      width: 30px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    tbody {
+      display: block;
+      max-height: 600px;
+      overflow-y: scroll;
+    }
+    thead, tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌐 World Clock Viewer</h1>
+
+  <div id="local-info">
+    <h2>📍 Your Location: Abu Dhabi, United Arab Emirates</h2>
+    <img class="flag" src="https://flagcdn.com/ae.svg" alt="UAE Flag" />
+    <div id="local-time">--:--:--</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Country</th>
+        <th>Time Zone</th>
+        <th>Current Time</th>
+      </tr>
+    </thead>
+    <tbody id="time-table"></tbody>
+  </table>
+
+  <script>
+    const countries = [
+      { name: "Afghanistan", zone: "Asia/Kabul", flag: "af" },
+      { name: "Albania", zone: "Europe/Tirane", flag: "al" },
+      { name: "Algeria", zone: "Africa/Algiers", flag: "dz" },
+      { name: "Argentina", zone: "America/Argentina/Buenos_Aires", flag: "ar" },
+      { name: "Australia", zone: "Australia/Sydney", flag: "au" },
+      { name: "Bangladesh", zone: "Asia/Dhaka", flag: "bd" },
+      { name: "Brazil", zone: "America/Sao_Paulo", flag: "br" },
+      { name: "Canada", zone: "America/Toronto", flag: "ca" },
+      { name: "China", zone: "Asia/Shanghai", flag: "cn" },
+      { name: "Egypt", zone: "Africa/Cairo", flag: "eg" },
+      { name: "France", zone: "Europe/Paris", flag: "fr" },
+      { name: "Germany", zone: "Europe/Berlin", flag: "de" },
+      { name: "India", zone: "Asia/Kolkata", flag: "in" },
+      { name: "Indonesia", zone: "Asia/Jakarta", flag: "id" },
+      { name: "Iran", zone: "Asia/Tehran", flag: "ir" },
+      { name: "Italy", zone: "Europe/Rome", flag: "it" },
+      { name: "Japan", zone: "Asia/Tokyo", flag: "jp" },
+      { name: "Mexico", zone: "America/Mexico_City", flag: "mx" },
+      { name: "Netherlands", zone: "Europe/Amsterdam", flag: "nl" },
+      { name: "New Zealand", zone: "Pacific/Auckland", flag: "nz" },
+      { name: "Nigeria", zone: "Africa/Lagos", flag: "ng" },
+      { name: "Pakistan", zone: "Asia/Karachi", flag: "pk" },
+      { name: "Philippines", zone: "Asia/Manila", flag: "ph" },
+      { name: "Russia", zone: "Europe/Moscow", flag: "ru" },
+      { name: "Saudi Arabia", zone: "Asia/Riyadh", flag: "sa" },
+      { name: "Singapore", zone: "Asia/Singapore", flag: "sg" },
+      { name: "South Africa", zone: "Africa/Johannesburg", flag: "za" },
+      { name: "South Korea", zone: "Asia/Seoul", flag: "kr" },
+      { name: "Spain", zone: "Europe/Madrid", flag: "es" },
+      { name: "Sweden", zone: "Europe/Stockholm", flag: "se" },
+      { name: "Switzerland", zone: "Europe/Zurich", flag: "ch" },
+      { name: "Thailand", zone: "Asia/Bangkok", flag: "th" },
+      { name: "Turkey", zone: "Europe/Istanbul", flag: "tr" },
+      { name: "Ukraine", zone: "Europe/Kiev", flag: "ua" },
+      { name: "United Arab Emirates", zone: "Asia/Dubai", flag: "ae" },
+      { name: "United Kingdom", zone: "Europe/London", flag: "gb" },
+      { name: "United States", zone: "America/New_York", flag: "us" },
+      { name: "Vietnam", zone: "Asia/Ho_Chi_Minh", flag: "vn" }
+    ];
+
+    function updateLocalTime() {
+      const time = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Dubai',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(new Date());
+      document.getElementById("local-time").textContent = time;
+    }
+
+    function updateTable() {
+      const table = document.getElementById("time-table");
+      table.innerHTML = "";
+      countries.forEach(({ name, zone, flag }) => {
+        const time = new Intl.DateTimeFormat('en-US', {
+          timeZone: zone,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).format(new Date());
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><img class="table-flag" src="https://flagcdn.com/${flag}.svg" alt="${name} flag"> ${name}</td>
+          <td>${zone}</td>
+          <td>${time}</td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    setInterval(() => {
+      updateLocalTime();
+      updateTable();
+    }, 1000);
+
+    updateLocalTime();
+    updateTable();
+  </script>
+</body>
+</html>
