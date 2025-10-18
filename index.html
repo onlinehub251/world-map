@@ -3,126 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>World Time Viewer</title>
+  <title>Time Clone</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 20px;
-      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
     h1 {
-      margin-bottom: 20px;
+      font-size: 2em;
+      margin-bottom: 10px;
     }
-    select {
-      padding: 10px;
-      margin: 10px;
-      font-size: 1em;
+    #clock {
+      font-size: 4em;
+      letter-spacing: 2px;
     }
-    #time-display {
-      margin-top: 30px;
+    #date {
       font-size: 1.5em;
-      font-weight: bold;
+      margin-top: 10px;
+    }
+    #timezone {
+      font-size: 1em;
+      margin-top: 20px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <h1>🌐 Select Continent & Country to View Time</h1>
-
-  <label for="continent">Continent:</label>
-  <select id="continent">
-    <option value="">-- Select Continent --</option>
-    <option value="Asia">Asia</option>
-    <option value="Europe">Europe</option>
-    <option value="Africa">Africa</option>
-    <option value="North America">North America</option>
-    <option value="South America">South America</option>
-    <option value="Australia">Australia</option>
-  </select>
-
-  <label for="country">Country:</label>
-  <select id="country">
-    <option value="">-- Select Country --</option>
-  </select>
-
-  <div id="time-display">🕒 Time will appear here</div>
+  <h1>Current Time</h1>
+  <div id="clock">--:--:--</div>
+  <div id="date">Loading date...</div>
+  <div id="timezone">Detecting timezone...</div>
 
   <script>
-    const timeZones = {
-      "Asia": {
-        "United Arab Emirates": "Asia/Dubai",
-        "India": "Asia/Kolkata",
-        "China": "Asia/Shanghai",
-        "Japan": "Asia/Tokyo",
-        "Singapore": "Asia/Singapore"
-      },
-      "Europe": {
-        "United Kingdom": "Europe/London",
-        "Germany": "Europe/Berlin",
-        "France": "Europe/Paris",
-        "Russia": "Europe/Moscow"
-      },
-      "Africa": {
-        "Egypt": "Africa/Cairo",
-        "South Africa": "Africa/Johannesburg",
-        "Nigeria": "Africa/Lagos"
-      },
-      "North America": {
-        "United States (New York)": "America/New_York",
-        "Canada (Toronto)": "America/Toronto",
-        "Mexico": "America/Mexico_City"
-      },
-      "South America": {
-        "Brazil": "America/Sao_Paulo",
-        "Argentina": "America/Argentina/Buenos_Aires",
-        "Colombia": "America/Bogota"
-      },
-      "Australia": {
-        "Australia (Sydney)": "Australia/Sydney",
-        "New Zealand": "Pacific/Auckland"
-      }
-    };
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-US', { hour12: false });
+      const date = now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const continentSelect = document.getElementById("continent");
-    const countrySelect = document.getElementById("country");
-    const timeDisplay = document.getElementById("time-display");
+      document.getElementById('clock').textContent = time;
+      document.getElementById('date').textContent = date;
+      document.getElementById('timezone').textContent = `Time Zone: ${zone}`;
+    }
 
-    continentSelect.addEventListener("change", () => {
-      const continent = continentSelect.value;
-      countrySelect.innerHTML = '<option value="">-- Select Country --</option>';
-      if (timeZones[continent]) {
-        for (const country in timeZones[continent]) {
-          const option = document.createElement("option");
-          option.value = country;
-          option.textContent = country;
-          countrySelect.appendChild(option);
-        }
-      }
-    });
-
-    countrySelect.addEventListener("change", () => {
-      const continent = continentSelect.value;
-      const country = countrySelect.value;
-      const zone = timeZones[continent]?.[country];
-      if (zone) {
-        const time = new Intl.DateTimeFormat('en-US', {
-          timeZone: zone,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false
-        }).format(new Date());
-        timeDisplay.textContent = `🕒 Current time in ${country}: ${time}`;
-      } else {
-        timeDisplay.textContent = "🕒 Time will appear here";
-      }
-    });
-
-    setInterval(() => {
-      if (countrySelect.value) {
-        countrySelect.dispatchEvent(new Event("change"));
-      }
-    }, 1000);
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
