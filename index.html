@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>World Time by Country</title>
+  <title>World Time Viewer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,68 +14,97 @@
     h1 {
       margin-bottom: 20px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
+    select {
       padding: 10px;
-      border: 1px solid #ccc;
-      text-align: left;
+      margin: 10px;
+      font-size: 1em;
     }
-    th {
-      background-color: #333;
-      color: white;
-    }
-    tbody {
-      display: block;
-      max-height: 500px;
-      overflow-y: scroll;
-    }
-    thead, tbody tr {
-      display: table;
-      width: 100%;
-      table-layout: fixed;
+    #time-display {
+      margin-top: 30px;
+      font-size: 1.5em;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>🌐 Current Time by Country</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Country</th>
-        <th>Time Zone</th>
-        <th>Current Time</th>
-      </tr>
-    </thead>
-    <tbody id="time-table"></tbody>
-  </table>
+  <h1>🌐 Select Continent & Country to View Time</h1>
+
+  <label for="continent">Continent:</label>
+  <select id="continent">
+    <option value="">-- Select Continent --</option>
+    <option value="Asia">Asia</option>
+    <option value="Europe">Europe</option>
+    <option value="Africa">Africa</option>
+    <option value="North America">North America</option>
+    <option value="South America">South America</option>
+    <option value="Australia">Australia</option>
+  </select>
+
+  <label for="country">Country:</label>
+  <select id="country">
+    <option value="">-- Select Country --</option>
+  </select>
+
+  <div id="time-display">🕒 Time will appear here</div>
 
   <script>
-    const countries = [
-      { name: "United Arab Emirates", zone: "Asia/Dubai" },
-      { name: "United States (New York)", zone: "America/New_York" },
-      { name: "United Kingdom", zone: "Europe/London" },
-      { name: "India", zone: "Asia/Kolkata" },
-      { name: "Japan", zone: "Asia/Tokyo" },
-      { name: "Australia (Sydney)", zone: "Australia/Sydney" },
-      { name: "Brazil", zone: "America/Sao_Paulo" },
-      { name: "South Africa", zone: "Africa/Johannesburg" },
-      { name: "Russia (Moscow)", zone: "Europe/Moscow" },
-      { name: "Canada (Toronto)", zone: "America/Toronto" },
-      { name: "Germany", zone: "Europe/Berlin" },
-      { name: "China", zone: "Asia/Shanghai" },
-      { name: "Singapore", zone: "Asia/Singapore" },
-      { name: "Argentina", zone: "America/Argentina/Buenos_Aires" },
-      { name: "Egypt", zone: "Africa/Cairo" }
-    ];
+    const timeZones = {
+      "Asia": {
+        "United Arab Emirates": "Asia/Dubai",
+        "India": "Asia/Kolkata",
+        "China": "Asia/Shanghai",
+        "Japan": "Asia/Tokyo",
+        "Singapore": "Asia/Singapore"
+      },
+      "Europe": {
+        "United Kingdom": "Europe/London",
+        "Germany": "Europe/Berlin",
+        "France": "Europe/Paris",
+        "Russia": "Europe/Moscow"
+      },
+      "Africa": {
+        "Egypt": "Africa/Cairo",
+        "South Africa": "Africa/Johannesburg",
+        "Nigeria": "Africa/Lagos"
+      },
+      "North America": {
+        "United States (New York)": "America/New_York",
+        "Canada (Toronto)": "America/Toronto",
+        "Mexico": "America/Mexico_City"
+      },
+      "South America": {
+        "Brazil": "America/Sao_Paulo",
+        "Argentina": "America/Argentina/Buenos_Aires",
+        "Colombia": "America/Bogota"
+      },
+      "Australia": {
+        "Australia (Sydney)": "Australia/Sydney",
+        "New Zealand": "Pacific/Auckland"
+      }
+    };
 
-    function updateTimes() {
-      const table = document.getElementById("time-table");
-      table.innerHTML = "";
-      countries.forEach(({ name, zone }) => {
+    const continentSelect = document.getElementById("continent");
+    const countrySelect = document.getElementById("country");
+    const timeDisplay = document.getElementById("time-display");
+
+    continentSelect.addEventListener("change", () => {
+      const continent = continentSelect.value;
+      countrySelect.innerHTML = '<option value="">-- Select Country --</option>';
+      if (timeZones[continent]) {
+        for (const country in timeZones[continent]) {
+          const option = document.createElement("option");
+          option.value = country;
+          option.textContent = country;
+          countrySelect.appendChild(option);
+        }
+      }
+    });
+
+    countrySelect.addEventListener("change", () => {
+      const continent = continentSelect.value;
+      const country = countrySelect.value;
+      const zone = timeZones[continent]?.[country];
+      if (zone) {
         const time = new Intl.DateTimeFormat('en-US', {
           timeZone: zone,
           hour: '2-digit',
@@ -83,14 +112,17 @@
           second: '2-digit',
           hour12: false
         }).format(new Date());
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${name}</td><td>${zone}</td><td>${time}</td>`;
-        table.appendChild(row);
-      });
-    }
+        timeDisplay.textContent = `🕒 Current time in ${country}: ${time}`;
+      } else {
+        timeDisplay.textContent = "🕒 Time will appear here";
+      }
+    });
 
-    setInterval(updateTimes, 1000);
-    updateTimes();
+    setInterval(() => {
+      if (countrySelect.value) {
+        countrySelect.dispatchEvent(new Event("change"));
+      }
+    }, 1000);
   </script>
 </body>
 </html>
