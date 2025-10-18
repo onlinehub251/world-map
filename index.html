@@ -45,40 +45,52 @@
   <table>
     <thead>
       <tr>
-        <th>Country / Region</th>
+        <th>Country</th>
         <th>Time Zone</th>
         <th>Current Time</th>
       </tr>
     </thead>
-    <tbody id="time-table">
-      <tr><td colspan="3">Loading time data...</td></tr>
-    </tbody>
+    <tbody id="time-table"></tbody>
   </table>
 
   <script>
-    async function fetchTimeZones() {
-      const response = await fetch('https://worldtimeapi.org/api/timezone');
-      const zones = await response.json();
-      const table = document.getElementById('time-table');
-      table.innerHTML = '';
+    const countries = [
+      { name: "United Arab Emirates", zone: "Asia/Dubai" },
+      { name: "United States (New York)", zone: "America/New_York" },
+      { name: "United Kingdom", zone: "Europe/London" },
+      { name: "India", zone: "Asia/Kolkata" },
+      { name: "Japan", zone: "Asia/Tokyo" },
+      { name: "Australia (Sydney)", zone: "Australia/Sydney" },
+      { name: "Brazil", zone: "America/Sao_Paulo" },
+      { name: "South Africa", zone: "Africa/Johannesburg" },
+      { name: "Russia (Moscow)", zone: "Europe/Moscow" },
+      { name: "Canada (Toronto)", zone: "America/Toronto" },
+      { name: "Germany", zone: "Europe/Berlin" },
+      { name: "China", zone: "Asia/Shanghai" },
+      { name: "Singapore", zone: "Asia/Singapore" },
+      { name: "Argentina", zone: "America/Argentina/Buenos_Aires" },
+      { name: "Egypt", zone: "Africa/Cairo" }
+    ];
 
-      for (const zone of zones) {
-        try {
-          const res = await fetch(`https://worldtimeapi.org/api/timezone/${zone}`);
-          const data = await res.json();
-          const time = new Date(data.datetime).toLocaleTimeString();
-          const country = zone.split('/')[0].replace('_', ' ');
-          const region = zone.split('/')[1] ? zone.split('/')[1].replace('_', ' ') : '';
-          const row = document.createElement('tr');
-          row.innerHTML = `<td>${country}${region ? ' / ' + region : ''}</td><td>${zone}</td><td>${time}</td>`;
-          table.appendChild(row);
-        } catch (err) {
-          console.error(`Failed to load ${zone}`, err);
-        }
-      }
+    function updateTimes() {
+      const table = document.getElementById("time-table");
+      table.innerHTML = "";
+      countries.forEach(({ name, zone }) => {
+        const time = new Intl.DateTimeFormat('en-US', {
+          timeZone: zone,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).format(new Date());
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${name}</td><td>${zone}</td><td>${time}</td>`;
+        table.appendChild(row);
+      });
     }
 
-    fetchTimeZones();
+    setInterval(updateTimes, 1000);
+    updateTimes();
   </script>
 </body>
 </html>
