@@ -3,144 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>World Time with Flags</title>
+  <title>World Time Table</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f0f0f0;
       padding: 20px;
       text-align: center;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transition: background-image 0.5s ease-in-out;
     }
     h1 {
       margin-bottom: 20px;
-      color: white;
-      text-shadow: 1px 1px 3px black;
     }
-    select {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
       padding: 10px;
-      margin: 10px;
-      font-size: 1em;
+      border: 1px solid #ccc;
+      text-align: left;
     }
-    #time-display {
-      margin-top: 30px;
-      font-size: 1.5em;
-      font-weight: bold;
+    th {
+      background-color: #333;
       color: white;
-      text-shadow: 1px 1px 3px black;
+    }
+    img.flag {
+      width: 30px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    tbody {
+      display: block;
+      max-height: 600px;
+      overflow-y: scroll;
+    }
+    thead, tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
     }
   </style>
 </head>
 <body>
-  <h1>🌐 Select Continent & Country</h1>
-
-  <label for="continent">Continent:</label>
-  <select id="continent">
-    <option value="">-- Select Continent --</option>
-    <option value="Asia">Asia</option>
-    <option value="Europe">Europe</option>
-    <option value="Africa">Africa</option>
-    <option value="North America">North America</option>
-    <option value="South America">South America</option>
-    <option value="Australia">Australia</option>
-  </select>
-
-  <label for="country">Country:</label>
-  <select id="country">
-    <option value="">-- Select Country --</option>
-  </select>
-
-  <div id="time-display">🕒 Time will appear here</div>
+  <h1>🌐 World Time Table</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Country</th>
+        <th>Time Zone</th>
+        <th>Current Time</th>
+      </tr>
+    </thead>
+    <tbody id="time-table"></tbody>
+  </table>
 
   <script>
-    const timeZones = {
-      "Asia": {
-        "United Arab Emirates": "Asia/Dubai",
-        "India": "Asia/Kolkata",
-        "China": "Asia/Shanghai",
-        "Japan": "Asia/Tokyo",
-        "Singapore": "Asia/Singapore"
-      },
-      "Europe": {
-        "United Kingdom": "Europe/London",
-        "Germany": "Europe/Berlin",
-        "France": "Europe/Paris",
-        "Russia": "Europe/Moscow"
-      },
-      "Africa": {
-        "Egypt": "Africa/Cairo",
-        "South Africa": "Africa/Johannesburg",
-        "Nigeria": "Africa/Lagos"
-      },
-      "North America": {
-        "United States": "America/New_York",
-        "Canada": "America/Toronto",
-        "Mexico": "America/Mexico_City"
-      },
-      "South America": {
-        "Brazil": "America/Sao_Paulo",
-        "Argentina": "America/Argentina/Buenos_Aires",
-        "Colombia": "America/Bogota"
-      },
-      "Australia": {
-        "Australia": "Australia/Sydney",
-        "New Zealand": "Pacific/Auckland"
-      }
-    };
+    const countries = [
+      { name: "Afghanistan", zone: "Asia/Kabul", flag: "af" },
+      { name: "Albania", zone: "Europe/Tirane", flag: "al" },
+      { name: "Algeria", zone: "Africa/Algiers", flag: "dz" },
+      { name: "Argentina", zone: "America/Argentina/Buenos_Aires", flag: "ar" },
+      { name: "Australia", zone: "Australia/Sydney", flag: "au" },
+      { name: "Austria", zone: "Europe/Vienna", flag: "at" },
+      { name: "Bangladesh", zone: "Asia/Dhaka", flag: "bd" },
+      { name: "Belgium", zone: "Europe/Brussels", flag: "be" },
+      { name: "Brazil", zone: "America/Sao_Paulo", flag: "br" },
+      { name: "Canada", zone: "America/Toronto", flag: "ca" },
+      { name: "China", zone: "Asia/Shanghai", flag: "cn" },
+      { name: "Colombia", zone: "America/Bogota", flag: "co" },
+      { name: "Denmark", zone: "Europe/Copenhagen", flag: "dk" },
+      { name: "Egypt", zone: "Africa/Cairo", flag: "eg" },
+      { name: "Finland", zone: "Europe/Helsinki", flag: "fi" },
+      { name: "France", zone: "Europe/Paris", flag: "fr" },
+      { name: "Germany", zone: "Europe/Berlin", flag: "de" },
+      { name: "India", zone: "Asia/Kolkata", flag: "in" },
+      { name: "Indonesia", zone: "Asia/Jakarta", flag: "id" },
+      { name: "Iran", zone: "Asia/Tehran", flag: "ir" },
+      { name: "Iraq", zone: "Asia/Baghdad", flag: "iq" },
+      { name: "Italy", zone: "Europe/Rome", flag: "it" },
+      { name: "Japan", zone: "Asia/Tokyo", flag: "jp" },
+      { name: "Kenya", zone: "Africa/Nairobi", flag: "ke" },
+      { name: "Mexico", zone: "America/Mexico_City", flag: "mx" },
+      { name: "Netherlands", zone: "Europe/Amsterdam", flag: "nl" },
+      { name: "New Zealand", zone: "Pacific/Auckland", flag: "nz" },
+      { name: "Nigeria", zone: "Africa/Lagos", flag: "ng" },
+      { name: "Pakistan", zone: "Asia/Karachi", flag: "pk" },
+      { name: "Philippines", zone: "Asia/Manila", flag: "ph" },
+      { name: "Poland", zone: "Europe/Warsaw", flag: "pl" },
+      { name: "Portugal", zone: "Europe/Lisbon", flag: "pt" },
+      { name: "Qatar", zone: "Asia/Qatar", flag: "qa" },
+      { name: "Russia", zone: "Europe/Moscow", flag: "ru" },
+      { name: "Saudi Arabia", zone: "Asia/Riyadh", flag: "sa" },
+      { name: "Singapore", zone: "Asia/Singapore", flag: "sg" },
+      { name: "South Africa", zone: "Africa/Johannesburg", flag: "za" },
+      { name: "South Korea", zone: "Asia/Seoul", flag: "kr" },
+      { name: "Spain", zone: "Europe/Madrid", flag: "es" },
+      { name: "Sweden", zone: "Europe/Stockholm", flag: "se" },
+      { name: "Switzerland", zone: "Europe/Zurich", flag: "ch" },
+      { name: "Thailand", zone: "Asia/Bangkok", flag: "th" },
+      { name: "Turkey", zone: "Europe/Istanbul", flag: "tr" },
+      { name: "Ukraine", zone: "Europe/Kiev", flag: "ua" },
+      { name: "United Arab Emirates", zone: "Asia/Dubai", flag: "ae" },
+      { name: "United Kingdom", zone: "Europe/London", flag: "gb" },
+      { name: "United States", zone: "America/New_York", flag: "us" },
+      { name: "Vietnam", zone: "Asia/Ho_Chi_Minh", flag: "vn" }
+      // Add more countries here as needed
+    ];
 
-    const flagUrls = {
-      "United Arab Emirates": "https://flagcdn.com/ae.svg",
-      "India": "https://flagcdn.com/in.svg",
-      "China": "https://flagcdn.com/cn.svg",
-      "Japan": "https://flagcdn.com/jp.svg",
-      "Singapore": "https://flagcdn.com/sg.svg",
-      "United Kingdom": "https://flagcdn.com/gb.svg",
-      "Germany": "https://flagcdn.com/de.svg",
-      "France": "https://flagcdn.com/fr.svg",
-      "Russia": "https://flagcdn.com/ru.svg",
-      "Egypt": "https://flagcdn.com/eg.svg",
-      "South Africa": "https://flagcdn.com/za.svg",
-      "Nigeria": "https://flagcdn.com/ng.svg",
-      "United States": "https://flagcdn.com/us.svg",
-      "Canada": "https://flagcdn.com/ca.svg",
-      "Mexico": "https://flagcdn.com/mx.svg",
-      "Brazil": "https://flagcdn.com/br.svg",
-      "Argentina": "https://flagcdn.com/ar.svg",
-      "Colombia": "https://flagcdn.com/co.svg",
-      "Australia": "https://flagcdn.com/au.svg",
-      "New Zealand": "https://flagcdn.com/nz.svg"
-    };
-
-    const continentSelect = document.getElementById("continent");
-    const countrySelect = document.getElementById("country");
-    const timeDisplay = document.getElementById("time-display");
-
-    continentSelect.addEventListener("change", () => {
-      const continent = continentSelect.value;
-      countrySelect.innerHTML = '<option value="">-- Select Country --</option>';
-      if (timeZones[continent]) {
-        for (const country in timeZones[continent]) {
-          const option = document.createElement("option");
-          option.value = country;
-          option.textContent = country;
-          countrySelect.appendChild(option);
-        }
-      }
-    });
-
-    countrySelect.addEventListener("change", () => {
-      updateTime();
-    });
-
-    function updateTime() {
-      const continent = continentSelect.value;
-      const country = countrySelect.value;
-      const zone = timeZones[continent]?.[country];
-      const flag = flagUrls[country];
-
-      if (zone) {
+    function updateTable() {
+      const table = document.getElementById("time-table");
+      table.innerHTML = "";
+      countries.forEach(({ name, zone, flag }) => {
         const time = new Intl.DateTimeFormat('en-US', {
           timeZone: zone,
           hour: '2-digit',
@@ -148,23 +124,18 @@
           second: '2-digit',
           hour12: false
         }).format(new Date());
-        timeDisplay.textContent = `🕒 Current time in ${country}: ${time}`;
-      } else {
-        timeDisplay.textContent = "🕒 Time will appear here";
-      }
-
-      if (flag) {
-        document.body.style.backgroundImage = `url(${flag})`;
-      } else {
-        document.body.style.backgroundImage = "";
-      }
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><img class="flag" src="https://flagcdn.com/${flag}.svg" alt="${name} flag"> ${name}</td>
+          <td>${zone}</td>
+          <td>${time}</td>
+        `;
+        table.appendChild(row);
+      });
     }
 
-    setInterval(() => {
-      if (countrySelect.value) {
-        updateTime();
-      }
-    }, 1000);
+    setInterval(updateTable, 1000);
+    updateTable();
   </script>
 </body>
 </html>
