@@ -3,64 +3,168 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Clone</title>
+  <title>World Time with Flags</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      color: #0f0;
-      font-family: 'Courier New', monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.5s ease-in-out;
     }
     h1 {
-      font-size: 2em;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
+      color: white;
+      text-shadow: 1px 1px 3px black;
     }
-    #clock {
-      font-size: 4em;
-      letter-spacing: 2px;
-    }
-    #date {
-      font-size: 1.5em;
-      margin-top: 10px;
-    }
-    #timezone {
+    select {
+      padding: 10px;
+      margin: 10px;
       font-size: 1em;
-      margin-top: 20px;
-      color: #ccc;
+    }
+    #time-display {
+      margin-top: 30px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 3px black;
     }
   </style>
 </head>
 <body>
-  <h1>Current Time</h1>
-  <div id="clock">--:--:--</div>
-  <div id="date">Loading date...</div>
-  <div id="timezone">Detecting timezone...</div>
+  <h1>🌐 Select Continent & Country</h1>
+
+  <label for="continent">Continent:</label>
+  <select id="continent">
+    <option value="">-- Select Continent --</option>
+    <option value="Asia">Asia</option>
+    <option value="Europe">Europe</option>
+    <option value="Africa">Africa</option>
+    <option value="North America">North America</option>
+    <option value="South America">South America</option>
+    <option value="Australia">Australia</option>
+  </select>
+
+  <label for="country">Country:</label>
+  <select id="country">
+    <option value="">-- Select Country --</option>
+  </select>
+
+  <div id="time-display">🕒 Time will appear here</div>
 
   <script>
-    function updateClock() {
-      const now = new Date();
-      const time = now.toLocaleTimeString('en-US', { hour12: false });
-      const date = now.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timeZones = {
+      "Asia": {
+        "United Arab Emirates": "Asia/Dubai",
+        "India": "Asia/Kolkata",
+        "China": "Asia/Shanghai",
+        "Japan": "Asia/Tokyo",
+        "Singapore": "Asia/Singapore"
+      },
+      "Europe": {
+        "United Kingdom": "Europe/London",
+        "Germany": "Europe/Berlin",
+        "France": "Europe/Paris",
+        "Russia": "Europe/Moscow"
+      },
+      "Africa": {
+        "Egypt": "Africa/Cairo",
+        "South Africa": "Africa/Johannesburg",
+        "Nigeria": "Africa/Lagos"
+      },
+      "North America": {
+        "United States": "America/New_York",
+        "Canada": "America/Toronto",
+        "Mexico": "America/Mexico_City"
+      },
+      "South America": {
+        "Brazil": "America/Sao_Paulo",
+        "Argentina": "America/Argentina/Buenos_Aires",
+        "Colombia": "America/Bogota"
+      },
+      "Australia": {
+        "Australia": "Australia/Sydney",
+        "New Zealand": "Pacific/Auckland"
+      }
+    };
 
-      document.getElementById('clock').textContent = time;
-      document.getElementById('date').textContent = date;
-      document.getElementById('timezone').textContent = `Time Zone: ${zone}`;
+    const flagUrls = {
+      "United Arab Emirates": "https://flagcdn.com/ae.svg",
+      "India": "https://flagcdn.com/in.svg",
+      "China": "https://flagcdn.com/cn.svg",
+      "Japan": "https://flagcdn.com/jp.svg",
+      "Singapore": "https://flagcdn.com/sg.svg",
+      "United Kingdom": "https://flagcdn.com/gb.svg",
+      "Germany": "https://flagcdn.com/de.svg",
+      "France": "https://flagcdn.com/fr.svg",
+      "Russia": "https://flagcdn.com/ru.svg",
+      "Egypt": "https://flagcdn.com/eg.svg",
+      "South Africa": "https://flagcdn.com/za.svg",
+      "Nigeria": "https://flagcdn.com/ng.svg",
+      "United States": "https://flagcdn.com/us.svg",
+      "Canada": "https://flagcdn.com/ca.svg",
+      "Mexico": "https://flagcdn.com/mx.svg",
+      "Brazil": "https://flagcdn.com/br.svg",
+      "Argentina": "https://flagcdn.com/ar.svg",
+      "Colombia": "https://flagcdn.com/co.svg",
+      "Australia": "https://flagcdn.com/au.svg",
+      "New Zealand": "https://flagcdn.com/nz.svg"
+    };
+
+    const continentSelect = document.getElementById("continent");
+    const countrySelect = document.getElementById("country");
+    const timeDisplay = document.getElementById("time-display");
+
+    continentSelect.addEventListener("change", () => {
+      const continent = continentSelect.value;
+      countrySelect.innerHTML = '<option value="">-- Select Country --</option>';
+      if (timeZones[continent]) {
+        for (const country in timeZones[continent]) {
+          const option = document.createElement("option");
+          option.value = country;
+          option.textContent = country;
+          countrySelect.appendChild(option);
+        }
+      }
+    });
+
+    countrySelect.addEventListener("change", () => {
+      updateTime();
+    });
+
+    function updateTime() {
+      const continent = continentSelect.value;
+      const country = countrySelect.value;
+      const zone = timeZones[continent]?.[country];
+      const flag = flagUrls[country];
+
+      if (zone) {
+        const time = new Intl.DateTimeFormat('en-US', {
+          timeZone: zone,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).format(new Date());
+        timeDisplay.textContent = `🕒 Current time in ${country}: ${time}`;
+      } else {
+        timeDisplay.textContent = "🕒 Time will appear here";
+      }
+
+      if (flag) {
+        document.body.style.backgroundImage = `url(${flag})`;
+      } else {
+        document.body.style.backgroundImage = "";
+      }
     }
 
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(() => {
+      if (countrySelect.value) {
+        updateTime();
+      }
+    }, 1000);
   </script>
 </body>
 </html>
